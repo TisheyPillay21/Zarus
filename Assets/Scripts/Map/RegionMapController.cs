@@ -87,6 +87,7 @@ namespace Zarus.Map
         private Bounds localBounds;
         private RegionRuntime currentHover;
         private RegionRuntime currentSelection;
+        private bool interactionEnabled = true;
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         private static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
 #if UNITY_EDITOR
@@ -123,6 +124,11 @@ namespace Zarus.Map
 
         private void Update()
         {
+            if (!interactionEnabled)
+            {
+                return;
+            }
+
             HandlePointer();
         }
 
@@ -479,6 +485,21 @@ namespace Zarus.Map
             var containerGo = new GameObject("RegionContainer");
             containerGo.transform.SetParent(transform, false);
             regionContainer = containerGo.transform;
+        }
+
+        public void SetInteractionEnabled(bool enabled)
+        {
+            if (interactionEnabled == enabled)
+            {
+                return;
+            }
+
+            interactionEnabled = enabled;
+
+            if (!interactionEnabled)
+            {
+                ClearHover();
+            }
         }
 
         [Serializable]

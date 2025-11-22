@@ -18,23 +18,47 @@ namespace Zarus.UI
         // UI Elements
         private Label timerValue;
         private Label provincesValue;
-        private Label gameSpeedValue;
         private Label provinceNameLabel;
         private Label provinceDescLabel;
 
         // Game State
+        private DateTime startTime;
         private float gameTime;
         private HashSet<string> visitedProvinces = new HashSet<string>();
         private int totalProvinces = 9; // South Africa has 9 provinces
+        private RegionEntry selectedRegion;
 
         protected override void Initialize()
         {
-            // Query UI elements
-            timerValue = Query<Label>("TimerValue");
-            provincesValue = Query<Label>("ProvincesValue");
-            gameSpeedValue = Query<Label>("GameSpeedValue");
-            provinceNameLabel = Query<Label>("ProvinceNameLabel");
-            provinceDescLabel = Query<Label>("ProvinceDescLabel");
+            // Ensure we have a valid document
+            if (uiDocument == null)
+            {
+                Debug.LogError("[GameHUD] UIDocument is null! Assign it in the Inspector.");
+                return;
+            }
+            
+            var root = uiDocument.rootVisualElement;
+            if (root == null)
+            {
+                Debug.LogError("[GameHUD] UIDocument root element is null!");
+                return;
+            }
+
+            Debug.Log($"[GameHUD] Initializing... Root element: {root.name}");
+
+            // Query UI elements directly from root
+            timerValue = root.Q<Label>("TimerValue");
+            provincesValue = root.Q<Label>("ProvincesValue");
+            provinceNameLabel = root.Q<Label>("ProvinceNameLabel");
+            provinceDescLabel = root.Q<Label>("ProvinceDescLabel");
+            
+            // Verify all elements were found
+            Debug.Log($"[GameHUD] Elements found - TimerValue: {timerValue != null}, ProvincesValue: {provincesValue != null}, ProvinceNameLabel: {provinceNameLabel != null}, ProvinceDescLabel: {provinceDescLabel != null}");
+            
+            if (timerValue == null) Debug.LogError("[GameHUD] TimerValue not found in UXML!");
+            if (provincesValue == null) Debug.LogError("[GameHUD] ProvincesValue not found in UXML!");
+            if (provinceNameLabel == null) Debug.LogError("[GameHUD] ProvinceNameLabel not found in UXML!");
+            if (provinceDescLabel == null) Debug.LogError("[GameHUD] ProvinceDescLabel not found in UXML!");
 
             // Find map controller if not assigned
             if (mapController == null)
@@ -51,27 +75,26 @@ namespace Zarus.UI
             }
 
             // Initialize displays
+            startTime = DateTime.Now;
             UpdateTimer();
             UpdateProvincesCounter();
+            
+            Debug.Log($"[GameHUD] Initialization complete. Timer text: '{timerValue?.text}', Provinces text: '{provincesValue?.text}'");
         }
 
         private void Update()
         {
-            // Update timer only when game is not paused
-            if (Time.timeScale > 0)
-            {
-                gameTime += Time.deltaTime;
-                UpdateTimer();
-            }
+            // Always show real-world 24h clock (HH:mm)
+            UpdateTimer();
         }
 
         private void UpdateTimer()
         {
             if (timerValue == null) return;
 
-            int minutes = Mathf.FloorToInt(gameTime / 60f);
-            int seconds = Mathf.FloorToInt(gameTime % 60f);
-            timerValue.text = $"{minutes:00}:{seconds:00}";
+            var now = DateTime.Now;
+            gameTime = (float)(now - startTime).TotalSeconds;
+            timerValue.text = now.ToString("HH:mm");
         }
 
         private void UpdateProvincesCounter()
@@ -85,24 +108,23 @@ namespace Zarus.UI
         {
             if (region == null) return;
 
-            // Update bottom info bar with hovered province
+            // Only show hover when nothing is selected
+            if (selectedRegion != null) return;
+
             if (provinceNameLabel != null)
-            {
                 provinceNameLabel.text = region.DisplayName.ToUpper();
-            }
 
             if (provinceDescLabel != null)
-            {
-                string desc = !string.IsNullOrEmpty(region.Description)
+                provinceDescLabel.text = !string.IsNullOrEmpty(region.Description)
                     ? region.Description
                     : "Hover over to explore";
-                provinceDescLabel.text = desc;
-            }
         }
 
         private void OnProvinceSelected(RegionEntry region)
         {
             if (region == null) return;
+
+            selectedRegion = region;
 
             // Mark province as visited
             if (!visitedProvinces.Contains(region.RegionId))
@@ -132,6 +154,7 @@ namespace Zarus.UI
         /// </summary>
         public void ResetTimer()
         {
+            startTime = DateTime.Now;
             gameTime = 0f;
             UpdateTimer();
         }

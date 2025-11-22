@@ -17,16 +17,19 @@ Welcome to Zarus. This document orients automation agents and coders who touch t
 
 ### Assets overview
 
+- `Documentation/ThirdPartyLicenses/` — Attribution requirements (SimpleMaps/CC BY 4.0, etc.).
+- `Map/Meshes/` — Generated meshes for each South African province (overwritten by the importer).
 - `Materials/` — Shared material assets.
 - `Prefabs/` — Prefabricated objects for reuse.
-- `Scenes/` — Unity scenes; open from here when you need a level context.
+- `Resources/Map/` — RegionDatabase.asset and runtime-loaded map data.
+- `Resources/UI/Cursors/` — Custom cursor textures.
+- `Scenes/` — Unity scenes; `Main.unity` is the primary game scene.
+- `Scripts/Map/` — Runtime map controllers + geo tooling. Prefab/scene hooks live here.
+- `Scripts/Map/Editor/` — GeoJSON importer for rebuilding region assets from `za.json`.
 - `Settings/` — URP pipeline, volume profiles, and other project-wide configurations.
 - `Shaders/` — Custom shader graphs/shader code.
-- `Sprites/` — 2D textures and sprite sheets.
-- `TutorialInfo/` — Unity sample/tutorial helper assets.
-- `Scripts/Map/` — Runtime map controllers + geo tooling. Prefab/scene hooks live here.
-- `Map/Meshes/` — Generated meshes for each South African province (overwritten by the importer).
-- `Documentation/ThirdPartyLicenses/` — Attribution requirements (SimpleMaps/CC BY 4.0, etc.).
+- `Sprites/` — 2D textures and sprite sheets. Contains `za.json` (South Africa GeoJSON data).
+- `UI/` — UI Toolkit assets (UXML layouts, USS styles, C# controllers).
 
 ## Unity MCP server
 

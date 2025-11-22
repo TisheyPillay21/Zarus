@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Zarus.Map;
 
 namespace Zarus.UI
 {
@@ -33,6 +34,20 @@ namespace Zarus.UI
         [SerializeField]
         private GameHUD gameHUD;
 
+        [Header("Gameplay Systems")]
+        [SerializeField]
+        private RegionMapController[] managedMapControllers;
+
+        [Header("Cursor")]
+        [SerializeField]
+        private Texture2D cursorTexture;
+
+        [SerializeField]
+        private Vector2 cursorHotspot = new Vector2(8f, 4f);
+
+        [SerializeField, Range(0.05f, 1f)]
+        private float cursorScale = 0.2f;
+
         [Header("Input")]
         [SerializeField]
         private InputActionAsset inputActions;
@@ -43,6 +58,8 @@ namespace Zarus.UI
 
         private bool isPaused;
         public bool IsPaused => isPaused;
+        private RegionMapController[] cachedMapControllers;
+        private Texture2D runtimeCursorTexture;
 
         private void Awake()
         {
@@ -56,6 +73,7 @@ namespace Zarus.UI
 
             // Initialize input system
             InitializeInput();
+            SetupCursor();
         }
 
         private void OnEnable()
@@ -74,6 +92,12 @@ namespace Zarus.UI
                 pauseAction.performed -= OnPausePerformed;
                 pauseAction.Disable();
             }
+
+            if (runtimeCursorTexture != null)
+            {
+                Destroy(runtimeCursorTexture);
+                runtimeCursorTexture = null;
+            }
         }
 
         private void Start()
@@ -83,6 +107,8 @@ namespace Zarus.UI
             {
                 gameHUD.Show();
             }
+
+            SetMapInteractionEnabled(true);
         }
 
         private void InitializeInput()
@@ -106,8 +132,10 @@ namespace Zarus.UI
                     Debug.LogWarning("[UIManager] Pause action not found in Input System.");
                 }
 
-                // Enable player controls by default
+                // Enable player controls by default and keep UI map active so pause works anytime
                 playerActionMap?.Enable();
+                uiActionMap?.Enable();
+                pauseAction?.Enable();
             }
         }
 
@@ -151,6 +179,7 @@ namespace Zarus.UI
                 pauseMenu.Show();
             }
 
+            SetMapInteractionEnabled(false);
             Debug.Log("[UIManager] Game paused.");
         }
 
@@ -165,8 +194,8 @@ namespace Zarus.UI
             Time.timeScale = 1f;
 
             // Switch input back to player mode
-            uiActionMap?.Disable();
             playerActionMap?.Enable();
+            uiActionMap?.Enable();
 
             // Hide pause menu
             if (pauseMenu != null)
@@ -174,6 +203,7 @@ namespace Zarus.UI
                 pauseMenu.Hide();
             }
 
+            SetMapInteractionEnabled(true);
             Debug.Log("[UIManager] Game resumed.");
         }
 
@@ -205,6 +235,96 @@ namespace Zarus.UI
         public void HideHUD()
         {
             gameHUD?.Hide();
+        }
+
+        private void SetupCursor()
+        {
+            if (cursorTexture == null)
+            {
+                cursorTexture = Resources.Load<Texture2D>("UI/Cursors/ModernCursor");
+            }
+
+            if (cursorTexture == null)
+            {
+                Debug.LogWarning("[UIManager] Custom cursor texture not found.");
+                return;
+            }
+
+            ApplyCursorTexture(cursorTexture);
+        }
+
+        private void ApplyCursorTexture(Texture2D sourceTexture)
+        {
+            if (runtimeCursorTexture != null)
+            {
+                Destroy(runtimeCursorTexture);
+                runtimeCursorTexture = null;
+            }
+
+            var textureToUse = sourceTexture;
+            float scale = Mathf.Clamp(cursorScale, 0.1f, 1f);
+            if (!Mathf.Approximately(scale, 1f))
+            {
+                textureToUse = ScaleCursorTexture(sourceTexture, scale);
+                runtimeCursorTexture = textureToUse;
+            }
+
+            var scaledHotspot = cursorHotspot * scale;
+            Cursor.SetCursor(textureToUse, scaledHotspot, CursorMode.Auto);
+        }
+
+        private Texture2D ScaleCursorTexture(Texture2D source, float scale)
+        {
+            int width = Mathf.Max(1, Mathf.RoundToInt(source.width * scale));
+            int height = Mathf.Max(1, Mathf.RoundToInt(source.height * scale));
+
+            var rt = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+            Graphics.Blit(source, rt);
+
+            var previous = RenderTexture.active;
+            RenderTexture.active = rt;
+
+            var scaled = new Texture2D(width, height, TextureFormat.RGBA32, false);
+            scaled.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+            scaled.Apply();
+
+            RenderTexture.active = previous;
+            RenderTexture.ReleaseTemporary(rt);
+
+            scaled.name = $"{source.name}_Scaled_{Mathf.RoundToInt(scale * 100f)}";
+            return scaled;
+        }
+
+        private void SetMapInteractionEnabled(bool enabled)
+        {
+            var controllers = GetMapControllers();
+            if (controllers == null)
+            {
+                return;
+            }
+
+            foreach (var controller in controllers)
+            {
+                if (controller != null)
+                {
+                    controller.SetInteractionEnabled(enabled);
+                }
+            }
+        }
+
+        private RegionMapController[] GetMapControllers()
+        {
+            if (managedMapControllers != null && managedMapControllers.Length > 0)
+            {
+                return managedMapControllers;
+            }
+
+            if (cachedMapControllers == null || cachedMapControllers.Length == 0)
+            {
+                cachedMapControllers = FindObjectsByType<RegionMapController>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            }
+
+            return cachedMapControllers;
         }
     }
 }

@@ -5,6 +5,8 @@
        noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" 
        editor-extension-mode="False">
     
+    <ui:Style src="../../Styles/MainTheme.uss" />
+    
     <!-- Game HUD Screen -->
     <ui:VisualElement name="GameHUDRoot" class="hud-container">
         
@@ -16,14 +18,14 @@
                 
                 <!-- Global Timer -->
                 <ui:VisualElement name="TimerStat" class="hud-stat">
-                    <ui:Label text="TIME" name="TimerLabel" class="hud-stat__label"/>
-                    <ui:Label text="00:00" name="TimerValue" class="hud-stat__value"/>
+                    <ui:Label text="TIME" name="TimerLabel" class="hud-stat__label" style="color: #e9f1ff;"/>
+                    <ui:Label text="00:00" name="TimerValue" class="hud-stat__value" style="color: #e9f1ff;"/>
                 </ui:VisualElement>
                 
                 <!-- Provinces Explored -->
                 <ui:VisualElement name="ProvincesStat" class="hud-stat">
-                    <ui:Label text="PROVINCES" name="ProvincesLabel" class="hud-stat__label"/>
-                    <ui:Label text="0 / 9" name="ProvincesValue" class="hud-stat__value"/>
+                    <ui:Label text="PROVINCES" name="ProvincesLabel" class="hud-stat__label" style="color: #e9f1ff;"/>
+                    <ui:Label text="0 / 9" name="ProvincesValue" class="hud-stat__value" style="color: #e9f1ff;"/>
                 </ui:VisualElement>
                 
             </ui:VisualElement>
@@ -33,8 +35,8 @@
                 
                 <!-- Game Speed (Future) -->
                 <ui:VisualElement name="GameSpeedStat" class="hud-stat">
-                    <ui:Label text="SPEED" name="GameSpeedLabel" class="hud-stat__label"/>
-                    <ui:Label text="1x" name="GameSpeedValue" class="hud-stat__value"/>
+                    <ui:Label text="SPEED" name="GameSpeedLabel" class="hud-stat__label" style="color: #e9f1ff;"/>
+                    <ui:Label text="1x" name="GameSpeedValue" class="hud-stat__value" style="color: #e9f1ff;"/>
                 </ui:VisualElement>
                 
             </ui:VisualElement>
@@ -45,9 +47,9 @@
         <ui:VisualElement name="BottomBar" class="hud-bottom">
             
             <!-- Current Province Info -->
-            <ui:VisualElement name="ProvinceInfo" class="hud-stat panel" style="min-width: 300px;">
-                <ui:Label text="No province selected" name="ProvinceNameLabel" class="hud-stat__label" style="margin-bottom: 4px;"/>
-                <ui:Label text="Click a province to view details" name="ProvinceDescLabel" class="hud-stat__value" style="font-size: 14px; -unity-font-style: normal;"/>
+                <ui:VisualElement name="ProvinceInfo" class="hud-stat panel" style="min-width: 300px;">
+                <ui:Label text="No province selected" name="ProvinceNameLabel" class="hud-stat__label" style="margin-bottom: 4px; color: #e9f1ff;"/>
+                <ui:Label text="Click a province to view details" name="ProvinceDescLabel" class="hud-stat__value" style="font-size: 14px; -unity-font-style: normal; color: #e9f1ff;"/>
             </ui:VisualElement>
             
         </ui:VisualElement>

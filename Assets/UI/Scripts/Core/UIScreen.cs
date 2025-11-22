@@ -20,6 +20,7 @@ namespace Zarus.UI
         protected VisualElement rootElement;
         protected bool isInitialized;
         protected bool isVisible;
+        private bool? requestedVisibility;
 
         public bool IsVisible => isVisible;
 
@@ -30,26 +31,14 @@ namespace Zarus.UI
                 uiDocument = GetComponent<UIDocument>();
             }
 
-            if (uiDocument != null && uiDocument.rootVisualElement != null)
-            {
-                rootElement = uiDocument.rootVisualElement;
-                Initialize();
-                isInitialized = true;
-
-                if (hideOnAwake)
-                {
-                    Hide();
-                }
-            }
+            TryInitializeDocument();
         }
 
         protected virtual void OnEnable()
         {
-            if (!isInitialized && uiDocument != null)
+            if (!isInitialized)
             {
-                rootElement = uiDocument.rootVisualElement;
-                Initialize();
-                isInitialized = true;
+                TryInitializeDocument();
             }
         }
 
@@ -66,11 +55,8 @@ namespace Zarus.UI
         /// </summary>
         public virtual void Show()
         {
-            if (rootElement == null) return;
-
-            rootElement.style.display = DisplayStyle.Flex;
-            isVisible = true;
-            OnShow();
+            requestedVisibility = true;
+            ApplyRequestedVisibility();
         }
 
         /// <summary>
@@ -78,11 +64,8 @@ namespace Zarus.UI
         /// </summary>
         public virtual void Hide()
         {
-            if (rootElement == null) return;
-
-            rootElement.style.display = DisplayStyle.None;
-            isVisible = false;
-            OnHide();
+            requestedVisibility = false;
+            ApplyRequestedVisibility();
         }
 
         /// <summary>
@@ -120,6 +103,51 @@ namespace Zarus.UI
             else
             {
                 Debug.LogWarning($"[{GetType().Name}] Button '{buttonName}' not found.");
+            }
+        }
+
+        private void TryInitializeDocument()
+        {
+            if (uiDocument == null || uiDocument.rootVisualElement == null || isInitialized)
+            {
+                return;
+            }
+
+            rootElement = uiDocument.rootVisualElement;
+            Initialize();
+            isInitialized = true;
+
+            if (!requestedVisibility.HasValue)
+            {
+                requestedVisibility = !hideOnAwake;
+            }
+
+            ApplyRequestedVisibility();
+        }
+
+        private void ApplyRequestedVisibility()
+        {
+            if (!requestedVisibility.HasValue || rootElement == null)
+            {
+                return;
+            }
+
+            bool targetVisible = requestedVisibility.Value;
+            rootElement.style.display = targetVisible ? DisplayStyle.Flex : DisplayStyle.None;
+
+            if (isVisible == targetVisible)
+            {
+                return;
+            }
+
+            isVisible = targetVisible;
+            if (targetVisible)
+            {
+                OnShow();
+            }
+            else
+            {
+                OnHide();
             }
         }
     }
