@@ -119,6 +119,98 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &120000001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 120000002}
+  - component: {fileID: 120000003}
+  m_Layer: 0
+  m_Name: SARegionMap
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &120000002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120000001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &120000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 983d268f2750439aa114fe9dbbd3a8f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  regionDatabase: {fileID: 11400000, guid: b7bf617f1aec092f19d3f87faee0cd52, type: 2}
+  fallbackGeoJson: {fileID: 4900000, guid: 3e95c020331e08bdca58f336b7df7d1a, type: 3}
+  regionMaterial: {fileID: 0}
+  regionContainer: {fileID: 0}
+  mapScale: 10
+  regionDepth: -0.1
+  sortingLayerName: Default
+  sortingOrder: 10
+  interactionCamera: {fileID: 519420031}
+  interactionMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  regionLayer: 0
+  autoFocusController: {fileID: 120000004}
+  raycastDistance: 500
+  enableHover: 1
+  enableSelection: 1
+  highlightSelection: 1
+  drawBoundsGizmo: 1
+  gizmoColor: {r: 0.66, g: 0.86, b: 1, a: 0.65}
+  gizmoSelectedColor: {r: 1, g: 0.8, b: 0.2, a: 0.75}
+  onRegionHovered:
+    m_PersistentCalls:
+      m_Calls: []
+  onRegionSelected:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &120000004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e353cc7cda946a88ca58f62b5ef29d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapController: {fileID: 120000003}
+  minOrthoSize: 3
+  maxOrthoSize: 18
+  zoomSpeed: 0.15
+  panSpeed: 0.0025
+  focusLerpSpeed: 5
+  clampToBounds: 1
+  clampPadding: {x: 0.5, y: 0.5}
+  drawDebugBounds: 0
 --- !u!1 &310942529
 GameObject:
   m_ObjectHideFlags: 0
@@ -221,6 +313,7 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
+  - component: {fileID: 120000004}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -253,7 +346,7 @@ MonoBehaviour:
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
   m_Cameras: []
-  m_RendererIndex: -1
+  m_RendererIndex: 0
   m_VolumeLayerMask:
     serializedVersion: 2
     m_Bits: 1
@@ -437,3 +530,4 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 619394802}
   - {fileID: 310942530}
+  - {fileID: 120000002}

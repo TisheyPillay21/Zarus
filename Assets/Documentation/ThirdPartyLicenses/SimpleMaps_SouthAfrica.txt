@@ -1,0 +1,8 @@
+SimpleMaps South Africa Provincial Boundaries
+Source: https://simplemaps.com/gis/country/za#admin1
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+License Text: https://creativecommons.org/licenses/by/4.0/
+
+Attribution Requirements:
+- Provide a link to https://simplemaps.com and the CC BY 4.0 license when redistributing the data or derivative works.
+- Indicate if changes were made to the geometry (normalization, triangulation, simplification within the importer).
