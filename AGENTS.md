@@ -188,4 +188,55 @@ Assembly definition files (.asmdef) are JSON; use standard file tools:
 - The GIS importer (`Zarus/Map/Rebuild Region Assets`) auto-generates `Assets/Resources/Map/RegionDatabase.asset` and meshes from `Assets/Sprites/za.json`. Run it after updating GIS data so the `Main.scene` overlay stays in sync. Never hand-edit generated meshes.
 - Artists configure colors/descriptions/URLs inside `RegionDatabase.asset`. Runtime toggles exist on `RegionMapController` in `Main.scene`; keep those values artist-friendly.
 
+## UI System (UI Toolkit)
+
+The game uses Unity's UI Toolkit for all user interface elements. The UI is designed to be artist-friendly with centralized theming.
+
+### Structure
+
+- `Assets/UI/Styles/` — USS theme files (like CSS) for visual styling
+- `Assets/UI/Layouts/` — UXML files (like HTML) defining UI structure
+- `Assets/UI/Scripts/` — C# controllers for UI behavior
+- `Assets/UI/Settings/` — PanelSettings and other UI configuration assets
+
+### Key Systems
+
+**UIManager** (`Assets/UI/Scripts/Core/UIManager.cs`)
+- Singleton managing all UI screens
+- Handles pause/resume with Input System integration
+- Switches between Player and UI action maps automatically
+
+**Screens**
+- `PauseMenu` — ESC key toggles, allows resume/quit
+- `GameHUD` — Non-diegetic overlay showing timer, province counter, selected province info
+- Future: Province detail cards (diegetic), settings screen
+
+**Theme System**
+- `MainTheme.uss` contains CSS variables for colors, spacing, fonts
+- Artists can modify these variables to restyle the entire UI
+- No code changes needed for visual updates
+
+### Adding New UI Screens
+
+1. Create UXML layout in `Assets/UI/Layouts/Screens/`
+2. Create C# controller inheriting from `UIScreen` in `Assets/UI/Scripts/Screens/`
+3. Apply `MainTheme.uss` stylesheet
+4. Register with UIManager if needed
+
+### MCP Integration
+
+Use MCP tools for UI work:
+- `manage_asset` for creating UXML/USS files
+- `create_script` for new UI controllers
+- `manage_gameobject` to add UIDocument components to scene
+
+**Important:** UIDocument components must reference both UXML and USS files. PanelSettings define rendering mode (Screen Space Overlay for HUD, World Space for diegetic UI).
+
+### Input System
+
+Pause is handled via "UI/Cancel" action (ESC key). UIManager automatically:
+- Disables "Player" action map when paused
+- Enables "UI" action map for menu navigation
+- Reverses on resume
+
 Keep this document short and update it whenever new workflows or directories appear so future agents can ramp up quickly.
