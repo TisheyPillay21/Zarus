@@ -124,6 +124,7 @@ namespace Zarus.Systems
         public bool HasTime => initialized;
         public UnityEvent<InGameTimeSnapshot> OnTimeChanged => onTimeChanged;
         public float TimeScale => timeScale;
+        public float NormalizedTimeOfDay => initialized ? minutesIntoDay / MinutesPerDay : 0f;
 
         private void Awake()
         {
@@ -161,6 +162,18 @@ namespace Zarus.Systems
         public void RestartCycle(bool randomizeDate = true)
         {
             InitializeTime(randomizeDate);
+        }
+
+        public void SetNormalizedTime(float normalized)
+        {
+            normalized = Mathf.Repeat(normalized, 1f);
+            if (!initialized)
+            {
+                InitializeTime();
+            }
+
+            minutesIntoDay = normalized * MinutesPerDay;
+            UpdateSnapshot(true);
         }
 
         private void InitializeTime(bool randomizeDate = true)
