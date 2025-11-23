@@ -273,23 +273,13 @@ namespace Zarus.Systems
             globalVolume.hideFlags = Application.isPlaying ? HideFlags.DontSave : HideFlags.DontSaveInEditor;
 
             var resolvedProfile = ResolveVolumeProfile();
-            if (resolvedProfile != null)
+            if (defaultVolumeProfile != null)
             {
-                if (defaultVolumeProfile != null)
-                {
-                    globalVolume.sharedProfile = defaultVolumeProfile;
-                }
-                else if (globalVolume.sharedProfile == null)
-                {
-                    if (GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset)
-                    {
-                        globalVolume.sharedProfile = resolvedProfile;
-                    }
-                    else
-                    {
-                        globalVolume.profile = resolvedProfile;
-                    }
-                }
+                globalVolume.sharedProfile = defaultVolumeProfile;
+            }
+            else if (globalVolume.sharedProfile == null)
+            {
+                globalVolume.profile = resolvedProfile;
             }
         }
 
@@ -311,11 +301,6 @@ namespace Zarus.Systems
                 {
                     return globalVolume.profile;
                 }
-            }
-
-            if (GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset urpAsset && urpAsset.defaultVolumeProfile != null)
-            {
-                return urpAsset.defaultVolumeProfile;
             }
 
             var runtimeProfile = ScriptableObject.CreateInstance<VolumeProfile>();
