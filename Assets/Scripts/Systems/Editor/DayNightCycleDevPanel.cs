@@ -13,6 +13,7 @@ namespace Zarus.Systems.Editor
         private DayNightCycleController controller;
         private float sliderValue = 0f;
         private bool autoApply = true;
+        private bool syncWithController = true;
 
         [MenuItem("Zarus/Time Tools/Day-Night Dev Panel")]
         public static void ShowWindow()
@@ -56,7 +57,23 @@ namespace Zarus.Systems.Editor
             {
                 EditorGUILayout.LabelField("Time Scrubber", EditorStyles.boldLabel);
                 autoApply = EditorGUILayout.ToggleLeft("Auto Apply", autoApply);
-                sliderValue = EditorGUILayout.Slider("Normalized Time", sliderValue, 0f, 1f);
+                syncWithController = EditorGUILayout.ToggleLeft("Sync Slider With Controller", syncWithController);
+
+                if (controller.HasTime && syncWithController)
+                {
+                    sliderValue = controller.NormalizedTimeOfDay;
+                }
+
+                EditorGUI.BeginChangeCheck();
+                var newSliderValue = EditorGUILayout.Slider("Normalized Time", sliderValue, 0f, 1f);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    sliderValue = newSliderValue;
+                    if (autoApply)
+                    {
+                        ApplySlider();
+                    }
+                }
 
                 EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button("Dawn")) ApplyPreset(0.2f);
@@ -69,12 +86,8 @@ namespace Zarus.Systems.Editor
                 {
                     if (GUILayout.Button("Apply Slider"))
                     {
-                        controller.SetNormalizedTime(sliderValue);
+                        ApplySlider();
                     }
-                }
-                else if (controller != null)
-                {
-                    controller.SetNormalizedTime(sliderValue);
                 }
             }
 
@@ -95,7 +108,19 @@ namespace Zarus.Systems.Editor
         private void ApplyPreset(float value)
         {
             sliderValue = value;
-            controller?.SetNormalizedTime(sliderValue);
+            ApplySlider();
+        }
+
+        private void ApplySlider()
+        {
+            if (controller == null)
+            {
+                return;
+            }
+
+            controller.SetNormalizedTime(sliderValue);
+            SceneView.RepaintAll();
+            EditorApplication.QueuePlayerLoopUpdate();
         }
     }
 }

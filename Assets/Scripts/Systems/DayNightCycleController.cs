@@ -9,6 +9,7 @@ namespace Zarus.Systems
     /// <summary>
     /// Drives the accelerated in-game clock and coordinates lighting/emission changes.
     /// </summary>
+    [ExecuteAlways]
     [DisallowMultipleComponent]
     public class DayNightCycleController : MonoBehaviour
     {
@@ -128,19 +129,7 @@ namespace Zarus.Systems
 
         private void Awake()
         {
-            if (mapController == null)
-            {
-                mapController = FindFirstObjectByType<RegionMapController>();
-            }
-
-            sunLight ??= AutoCreateLight("Dynamic Sun", LightType.Directional, new Color(1f, 0.956f, 0.839f));
-            moonLight ??= AutoCreateLight("Dynamic Moon", LightType.Directional, new Color(0.65f, 0.75f, 0.9f));
-            if (nightLightsEffect == null)
-            {
-                var lightsGo = new GameObject("NightLightsEffect");
-                lightsGo.transform.SetParent(transform, false);
-                nightLightsEffect = lightsGo.AddComponent<NightLightsEffect>();
-            }
+            EnsureDependencies();
         }
 
         private void Start()
@@ -150,6 +139,16 @@ namespace Zarus.Systems
 
         private void Update()
         {
+            if (!Application.isPlaying)
+            {
+                if (initialized)
+                {
+                    ApplyLighting(currentSnapshot);
+                }
+
+                return;
+            }
+
             if (!initialized)
             {
                 return;
@@ -167,6 +166,7 @@ namespace Zarus.Systems
         public void SetNormalizedTime(float normalized)
         {
             normalized = Mathf.Repeat(normalized, 1f);
+            EnsureDependencies();
             if (!initialized)
             {
                 InitializeTime();
@@ -178,11 +178,41 @@ namespace Zarus.Systems
 
         private void InitializeTime(bool randomizeDate = true)
         {
+            EnsureDependencies();
             currentDate = GenerateStartDate(randomizeDate);
             minutesIntoDay = randomizeStartTime ? GetRandomStartMinutes() : 0f;
             currentDayIndex = 1;
             initialized = true;
             UpdateSnapshot(true);
+        }
+
+        private void EnsureDependencies()
+        {
+            if (mapController == null)
+            {
+                mapController = FindFirstObjectByType<RegionMapController>();
+            }
+
+            if (sunLight == null)
+            {
+                sunLight = AutoCreateLight("Dynamic Sun", LightType.Directional, new Color(1f, 0.956f, 0.839f));
+            }
+
+            if (moonLight == null)
+            {
+                moonLight = AutoCreateLight("Dynamic Moon", LightType.Directional, new Color(0.65f, 0.75f, 0.9f));
+            }
+
+            if (nightLightsEffect == null)
+            {
+                nightLightsEffect = FindFirstObjectByType<NightLightsEffect>();
+                if (nightLightsEffect == null)
+                {
+                    var lightsGo = new GameObject("NightLightsEffect");
+                    lightsGo.transform.SetParent(transform, false);
+                    nightLightsEffect = lightsGo.AddComponent<NightLightsEffect>();
+                }
+            }
         }
 
         private void AdvanceTime(float minutes)
