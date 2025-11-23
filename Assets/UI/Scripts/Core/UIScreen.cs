@@ -42,6 +42,16 @@ namespace Zarus.UI
             }
         }
 
+        protected virtual void Start()
+        {
+            // UIDocument may finish cloning its visual tree a frame after Awake/OnEnable.
+            // Running TryInitializeDocument() here ensures derived screens always get a root.
+            if (!isInitialized)
+            {
+                TryInitializeDocument();
+            }
+        }
+
         /// <summary>
         /// Override this to set up UI element references and event handlers.
         /// </summary>

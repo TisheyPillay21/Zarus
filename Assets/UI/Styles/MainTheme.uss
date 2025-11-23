@@ -81,12 +81,13 @@
 
 .unity-label {
     color: var(--text-primary);
-    -unity-font-definition: initial;
+    -unity-font-definition: url("project://database/Assets/Fonts/Roboto-Regular 1 SDF.asset?fileID=11400000&guid=21a08988cc3416b58abd39431e45c023&type=2#Roboto-Regular 1 SDF");
     font-size: var(--font-size-normal);
 }
 
 .unity-text-element {
     color: var(--text-primary);
+    -unity-font-definition: url("project://database/Assets/Fonts/Roboto-Regular 1 SDF.asset?fileID=11400000&guid=21a08988cc3416b58abd39431e45c023&type=2#Roboto-Regular 1 SDF");
 }
 
 /* Font Styles */
@@ -233,18 +234,19 @@
     align-items: center;
 }
 
+
 .hud-stat__label {
     color: var(--text-muted);
     font-size: var(--font-size-small);
     margin-right: var(--spacing-sm);
-    -unity-font-definition: initial;
+    -unity-font-definition: url("project://database/Assets/Fonts/Roboto-Regular 1 SDF.asset?fileID=11400000&guid=21a08988cc3416b58abd39431e45c023&type=2#Roboto-Regular 1 SDF");
 }
 
 .hud-stat__value {
     color: var(--text-primary);
     font-size: var(--font-size-large);
     -unity-font-style: bold;
-    -unity-font-definition: initial;
+    -unity-font-definition: url("project://database/Assets/Fonts/Roboto-Regular 1 SDF.asset?fileID=11400000&guid=21a08988cc3416b58abd39431e45c023&type=2#Roboto-Regular 1 SDF");
 }
 
 /* ========================================

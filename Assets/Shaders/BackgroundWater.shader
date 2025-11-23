@@ -2,10 +2,10 @@ Shader "Custom/BackgroundWater"
 {
     Properties
     {
-        _ShallowColor("Shallow Color", Color) = (0.19, 0.65, 0.88, 1)
-        _DeepColor("Deep Water Color", Color) = (0.02, 0.17, 0.32, 1)
-        _HorizonColor("Horizon Tint", Color) = (0.0, 0.35, 0.6, 1)
-        _WaveScale("Wave Tiling", Range(0.5, 40)) = 8
+        _ShallowColor("Shallow Color", Color) = (0.1, 0.5, 0.7, 1)
+        _DeepColor("Deep Water Color", Color) = (0.01, 0.08, 0.2, 1)
+        _HorizonColor("Horizon Tint", Color) = (0.0, 0.22, 0.45, 1)
+        _WaveScale("Wave Tiling", Range(0.5, 40)) = 12
         _WaveSpeed1("Primary Speed", Range(0.0, 2.0)) = 0.45
         _WaveSpeed2("Secondary Speed", Range(0.0, 2.0)) = 0.25
         _Distortion("Distortion Strength", Range(0.0, 1.0)) = 0.2
@@ -123,17 +123,18 @@ Shader "Custom/BackgroundWater"
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
                 float waveScale = max(_WaveScale, 0.01);
-                float2 uv = input.uv * waveScale;
+                float2 uv = input.uv * waveScale * 1.5;
                 float time = _Time.y;
 
                 float n1 = fbm(uv * 1.25 + time * _WaveSpeed1);
                 float n2 = fbm(float2(uv.y, uv.x) * 1.75 - time * (_WaveSpeed2 + 0.1));
-                float combined = n1 * 0.65 + n2 * 0.35;
+                float fine = fbm(uv * 2.75 + time * (_WaveSpeed1 + _WaveSpeed2 + 0.2)); // tighter ripples for smaller surface waves
+                float combined = saturate(n1 * 0.4 + n2 * 0.25 + fine * 0.65);
 
                 float2 distortion = float2(n2 - 0.5, n1 - 0.5) * _Distortion;
                 float2 flowUV = uv + distortion + float2(time * _WaveSpeed1, time * _WaveSpeed2);
 
-                float crest = sin((flowUV.x + flowUV.y) * 3.14159);
+                float crest = sin((flowUV.x + flowUV.y) * 4.71239);
                 crest = crest * 0.5 + 0.5;
                 crest = saturate(crest + combined * 0.5);
 
