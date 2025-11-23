@@ -279,17 +279,33 @@ namespace Zarus.UI
             int height = Mathf.Max(1, Mathf.RoundToInt(source.height * scale));
 
             var rt = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
-            Graphics.Blit(source, rt);
-
             var previous = RenderTexture.active;
-            RenderTexture.active = rt;
+            Texture2D scaled = null;
 
-            var scaled = new Texture2D(width, height, TextureFormat.RGBA32, false);
-            scaled.ReadPixels(new Rect(0, 0, width, height), 0, 0);
-            scaled.Apply();
+            try
+            {
+                Graphics.Blit(source, rt);
+                RenderTexture.active = rt;
 
-            RenderTexture.active = previous;
-            RenderTexture.ReleaseTemporary(rt);
+                scaled = new Texture2D(width, height, TextureFormat.RGBA32, false);
+                scaled.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+                scaled.Apply();
+            }
+            finally
+            {
+                // Ensure the temporary RT is no longer active before releasing it.
+                if (RenderTexture.active == rt)
+                {
+                    RenderTexture.active = previous;
+                }
+
+                if (RenderTexture.active == rt)
+                {
+                    RenderTexture.active = null;
+                }
+
+                RenderTexture.ReleaseTemporary(rt);
+            }
 
             scaled.name = $"{source.name}_Scaled_{Mathf.RoundToInt(scale * 100f)}";
             return scaled;
