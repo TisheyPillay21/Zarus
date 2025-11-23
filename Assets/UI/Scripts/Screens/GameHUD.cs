@@ -295,7 +295,7 @@ namespace Zarus.UI
             {
                 string desc = !string.IsNullOrEmpty(region.Description)
                     ? region.Description
-                    : "Selected province";
+                    : string.Empty;
                 provinceDescLabel.text = desc;
             }
 

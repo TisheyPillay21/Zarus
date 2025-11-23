@@ -14,7 +14,7 @@
         <ui:VisualElement name="TopBar" class="hud-top">
             
             <!-- Left Stats Group -->
-            <ui:VisualElement name="LeftStats" class="flex-row">
+            <ui:VisualElement name="LeftStats" class="flex-column">
                 
                 <!-- Global Timer -->
                 <ui:VisualElement name="TimerStat" class="hud-stat hud-stat--vertical">
@@ -22,18 +22,13 @@
                     <ui:Label text="--:-- | 1x" name="TimerSubValue" class="hud-timer-detail" />
                     <ui:Label text="Jan 1st 2000" name="TimerDetail" class="hud-timer-detail" />
                 </ui:VisualElement>
-                
-            </ui:VisualElement>
-            
-        </ui:VisualElement>
-        
-        <!-- Bottom Info Bar (Context-sensitive) -->
-        <ui:VisualElement name="BottomBar" class="hud-bottom">
-            
-            <!-- Current Province Info -->
+
+                <!-- Current Province Info -->
                 <ui:VisualElement name="ProvinceInfo" class="hud-stat panel hud-province-info" style="min-width: 320px;">
-                <ui:Label text="No province selected" name="ProvinceNameLabel" class="hud-stat__label" style="margin-bottom: 4px; color: #e9f1ff;"/>
-                <ui:Label text="Click a province to view details" name="ProvinceDescLabel" class="hud-stat__value" style="font-size: 14px; -unity-font-style: normal; color: #e9f1ff;"/>
+                    <ui:Label text="No province selected" name="ProvinceNameLabel" class="hud-stat__label" style="margin-bottom: 4px; color: #e9f1ff;"/>
+                    <ui:Label text="Click a province to view details" name="ProvinceDescLabel" class="hud-stat__value" style="font-size: 14px; -unity-font-style: normal; color: #e9f1ff;"/>
+                </ui:VisualElement>
+                
             </ui:VisualElement>
             
         </ui:VisualElement>
