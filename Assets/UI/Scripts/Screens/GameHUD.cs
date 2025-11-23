@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Zarus.Map;
+using Zarus.Systems;
 
 namespace Zarus.UI
 {
@@ -15,6 +15,10 @@ namespace Zarus.UI
         [SerializeField]
         private RegionMapController mapController;
 
+        [Header("Time Source")]
+        [SerializeField]
+        private DayNightCycleController dayNightController;
+
         // UI Elements
         private Label timerValue;
         private Label provincesValue;
@@ -22,11 +26,11 @@ namespace Zarus.UI
         private Label provinceDescLabel;
 
         // Game State
-        private DateTime startTime;
-        private float gameTime;
         private HashSet<string> visitedProvinces = new HashSet<string>();
         private int totalProvinces = 9; // South Africa has 9 provinces
         private RegionEntry selectedRegion;
+        private InGameTimeSnapshot latestTimeSnapshot;
+        private bool hasTimeSnapshot;
 
         protected override void Initialize()
         {
@@ -100,27 +104,58 @@ namespace Zarus.UI
                 totalProvinces = mapController.Entries.Count;
             }
 
+            if (dayNightController == null)
+            {
+                dayNightController = FindFirstObjectByType<DayNightCycleController>();
+            }
+
+            if (dayNightController == null)
+            {
+                var bootstrapGo = new GameObject("DayNightCycleAuto");
+                dayNightController = bootstrapGo.AddComponent<DayNightCycleController>();
+            }
+
+            if (dayNightController != null)
+            {
+                dayNightController.TimeUpdated += HandleTimeUpdated;
+                if (dayNightController.HasTime)
+                {
+                    HandleTimeUpdated(dayNightController.CurrentTime);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[GameHUD] DayNightCycleController not found; timer display will not reflect in-game time.");
+            }
+
             // Initialize displays
-            startTime = DateTime.Now;
             UpdateTimer();
             UpdateProvincesCounter();
             
             Debug.Log($"[GameHUD] Initialization complete. Timer text: '{timerValue?.text}', Provinces text: '{provincesValue?.text}', Timer visible: {timerValue?.visible}, Timer display: {timerValue?.style.display}");
         }
 
-        private void Update()
-        {
-            // Always show real-world 24h clock (HH:mm)
-            UpdateTimer();
-        }
-
         private void UpdateTimer()
         {
             if (timerValue == null) return;
 
-            var now = DateTime.Now;
-            gameTime = (float)(now - startTime).TotalSeconds;
-            timerValue.text = now.ToString("HH:mm");
+            if (hasTimeSnapshot)
+            {
+                var indicator = latestTimeSnapshot.GetIndicatorLabel();
+                var formatted = latestTimeSnapshot.DateTime.ToString("MMM d, HH:mm");
+                timerValue.text = $"{indicator} Day {latestTimeSnapshot.DayIndex} — {formatted}";
+            }
+            else
+            {
+                timerValue.text = "[SYNC] --:--";
+            }
+        }
+
+        private void HandleTimeUpdated(InGameTimeSnapshot snapshot)
+        {
+            latestTimeSnapshot = snapshot;
+            hasTimeSnapshot = true;
+            UpdateTimer();
         }
 
         private void UpdateProvincesCounter()
@@ -180,9 +215,7 @@ namespace Zarus.UI
         /// </summary>
         public void ResetTimer()
         {
-            startTime = DateTime.Now;
-            gameTime = 0f;
-            UpdateTimer();
+            dayNightController?.RestartCycle();
         }
 
         /// <summary>
@@ -199,7 +232,12 @@ namespace Zarus.UI
         /// </summary>
         public float GetGameTime()
         {
-            return gameTime;
+            if (!hasTimeSnapshot)
+            {
+                return 0f;
+            }
+
+            return latestTimeSnapshot.TimeOfDayMinutes * 60f;
         }
 
         /// <summary>
@@ -217,6 +255,11 @@ namespace Zarus.UI
             {
                 mapController.OnRegionHovered.RemoveListener(OnProvinceHovered);
                 mapController.OnRegionSelected.RemoveListener(OnProvinceSelected);
+            }
+
+            if (dayNightController != null)
+            {
+                dayNightController.TimeUpdated -= HandleTimeUpdated;
             }
         }
     }
