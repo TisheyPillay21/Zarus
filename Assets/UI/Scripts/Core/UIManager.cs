@@ -117,10 +117,8 @@ namespace Zarus.UI
         private void Start()
         {
             // Show HUD on game start
-            if (gameHUD != null)
-            {
-                gameHUD.Show();
-            }
+            EnsureGameHUDReference();
+            gameHUD?.Show();
 
             SetMapInteractionEnabled(true);
         }
@@ -270,6 +268,7 @@ namespace Zarus.UI
         /// </summary>
         public void ShowHUD()
         {
+            EnsureGameHUDReference();
             gameHUD?.Show();
         }
 
@@ -278,6 +277,7 @@ namespace Zarus.UI
         /// </summary>
         public void HideHUD()
         {
+            EnsureGameHUDReference();
             gameHUD?.Hide();
         }
 
@@ -396,6 +396,14 @@ namespace Zarus.UI
             }
 
             return cachedMapControllers;
+        }
+
+        private void EnsureGameHUDReference()
+        {
+            if (gameHUD == null)
+            {
+                gameHUD = FindFirstObjectByType<GameHUD>();
+            }
         }
     }
 }

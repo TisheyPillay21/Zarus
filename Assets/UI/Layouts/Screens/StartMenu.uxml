@@ -18,16 +18,16 @@
                 <ui:Button name="SettingsButton" class="button button--secondary menu-button" text="Settings" />
                 <ui:Button name="ExitButton" class="button button--danger menu-button" text="Exit" />
             </ui:VisualElement>
-
-            <ui:VisualElement name="TutorialPanel" class="panel hidden" style="margin-top: 16px;">
-                <ui:Label class="menu-title" text="How to Play" style="font-size: 24px;" />
-                <ui:Label class="menu-subtitle" text="Pan across the region map, hover provinces for details, and complete objectives before time runs out." style="margin-bottom: 12px;" />
-                <ui:Label class="menu-subtitle" text="Left mouse selects, mouse wheel zooms, and ESC opens the pause/settings menu." style="font-size: 16px;" />
-                <ui:Button name="CloseTutorialButton" class="button button--secondary menu-button" text="Close" style="margin-top: 16px;" />
-            </ui:VisualElement>
-
-            <ui:VisualElement name="SettingsPanelHost" class="panel hidden settings-panel-host" style="margin-top: 16px;" />
         </ui:VisualElement>
+
+        <ui:VisualElement name="TutorialPanel" class="panel hidden" style="margin-top: 16px;">
+            <ui:Label class="menu-title" text="How to Play" style="font-size: 24px;" />
+            <ui:Label class="menu-subtitle" text="Pan across the region map, hover provinces for details, and complete objectives before time runs out." style="margin-bottom: 12px;" />
+            <ui:Label class="menu-subtitle" text="Left mouse selects, mouse wheel zooms, and ESC opens the pause/settings menu." style="font-size: 16px;" />
+            <ui:Button name="CloseTutorialButton" class="button button--secondary menu-button" text="Close" style="margin-top: 16px;" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="SettingsPanelHost" class="panel hidden settings-panel-host" style="margin-top: 16px;" />
     </ui:VisualElement>
 
 </ui:UXML>

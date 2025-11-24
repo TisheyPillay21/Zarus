@@ -25,7 +25,7 @@
                 <!-- Resume Button -->
                 <ui:Button text="Resume" name="ResumeButton" class="button button--primary menu-button"/>
                 
-                <!-- Settings Button (Future) -->
+                <!-- Settings Button -->
                 <ui:Button text="Settings" name="SettingsButton" class="button button--secondary menu-button"/>
                 
                 <!-- Quit to Menu Button -->
@@ -35,11 +35,10 @@
             
             <!-- Help Text -->
             <ui:Label text="Press ESC to resume" name="HelpText" class="menu-subtitle" style="margin-top: 24px; font-size: 14px;"/>
-
-            <!-- Shared Settings Panel Host -->
-            <ui:VisualElement name="SettingsPanelHost" class="panel hidden settings-panel-host" style="margin-top: 16px;" />
-            
         </ui:VisualElement>
+
+        <!-- Shared Settings Panel Host -->
+        <ui:VisualElement name="SettingsPanelHost" class="panel hidden settings-panel-host" style="margin-top: 16px;" />
         
     </ui:VisualElement>
     

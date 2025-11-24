@@ -8,6 +8,8 @@ namespace Zarus.UI
     /// </summary>
     public class PauseMenu : UIScreen
     {
+        private const string HiddenClassName = "hidden";
+
         [Header("Settings Panel")]
         [SerializeField]
         private VisualTreeAsset settingsPanelAsset;
@@ -28,8 +30,13 @@ namespace Zarus.UI
             menuPanel = Query<VisualElement>("MenuPanel");
             settingsPanelHost = Query<VisualElement>("SettingsPanelHost");
 
-            if (settingsPanelHost != null && settingsPanelAsset != null)
+            if (settingsPanelHost != null)
             {
+                if (settingsPanelAsset == null)
+                {
+                    Debug.LogWarning("[PauseMenu] Settings panel asset not assigned. Using default template.");
+                }
+
                 settingsPanel = SettingsPanelView.Create(settingsPanelHost, settingsPanelAsset);
                 if (settingsPanel != null)
                 {
@@ -38,7 +45,7 @@ namespace Zarus.UI
             }
             else
             {
-                Debug.LogWarning("[PauseMenu] Settings panel host or asset missing.");
+                Debug.LogWarning("[PauseMenu] Settings panel host missing.");
             }
 
             // Register button callbacks
@@ -67,6 +74,8 @@ namespace Zarus.UI
             {
                 menuPanel.AddToClassList("slide-up--active");
             }
+
+            UpdateSettingsVisibility();
         }
 
         protected override void OnHide()
@@ -77,7 +86,11 @@ namespace Zarus.UI
             if (menuPanel != null)
             {
                 menuPanel.RemoveFromClassList("slide-up--active");
+                menuPanel.RemoveFromClassList(HiddenClassName);
             }
+
+            EnsureSettingsPanelHidden();
+            UIManager.Instance?.ShowHUD();
         }
 
         private void OnResumeClicked()
@@ -91,10 +104,12 @@ namespace Zarus.UI
             if (settingsPanel != null)
             {
                 settingsPanel.Toggle();
+                UpdateSettingsVisibility();
             }
             else
             {
                 Debug.LogWarning("[PauseMenu] Settings panel unavailable.");
+                ToggleFallbackSettingsHost();
             }
         }
 
@@ -114,7 +129,81 @@ namespace Zarus.UI
 
         private void OnSettingsClosed()
         {
-            // Reserved hook for future (e.g., focus return)
+            UpdateSettingsVisibility();
+        }
+
+        private void UpdateSettingsVisibility()
+        {
+            bool settingsVisible = IsSettingsVisible();
+
+            if (menuPanel != null)
+            {
+                if (settingsVisible)
+                {
+                    menuPanel.AddToClassList(HiddenClassName);
+                }
+                else
+                {
+                    menuPanel.RemoveFromClassList(HiddenClassName);
+                }
+            }
+
+            if (settingsVisible)
+            {
+                UIManager.Instance?.HideHUD();
+            }
+            else
+            {
+                UIManager.Instance?.ShowHUD();
+            }
+        }
+
+        private bool IsSettingsVisible()
+        {
+            if (settingsPanel != null)
+            {
+                return settingsPanel.IsVisible;
+            }
+
+            if (settingsPanelHost != null)
+            {
+                return !settingsPanelHost.ClassListContains(HiddenClassName);
+            }
+
+            return false;
+        }
+
+        private void ToggleFallbackSettingsHost()
+        {
+            if (settingsPanelHost == null)
+            {
+                return;
+            }
+
+            bool isHidden = settingsPanelHost.ClassListContains(HiddenClassName);
+            if (isHidden)
+            {
+                settingsPanelHost.RemoveFromClassList(HiddenClassName);
+            }
+            else
+            {
+                settingsPanelHost.AddToClassList(HiddenClassName);
+            }
+
+            UpdateSettingsVisibility();
+        }
+
+        private void EnsureSettingsPanelHidden()
+        {
+            if (settingsPanel != null && settingsPanel.IsVisible)
+            {
+                settingsPanel.Hide();
+            }
+
+            if (settingsPanelHost != null)
+            {
+                settingsPanelHost.AddToClassList(HiddenClassName);
+            }
         }
     }
 }

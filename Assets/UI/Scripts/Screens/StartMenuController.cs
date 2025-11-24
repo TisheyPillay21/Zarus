@@ -14,6 +14,8 @@ namespace Zarus.UI
     [RequireComponent(typeof(UIDocument))]
     public class StartMenuController : MonoBehaviour
     {
+        private const string HiddenClassName = "hidden";
+
         [Header("Scenes")]
         [SerializeField]
         private string gameplaySceneName = "Main";
@@ -108,8 +110,7 @@ namespace Zarus.UI
 
             if (settingsPanelAsset == null)
             {
-                Debug.LogWarning("[StartMenu] Settings panel asset not assigned.");
-                return;
+                Debug.LogWarning("[StartMenu] Settings panel asset not assigned. Using default template.");
             }
 
             settingsPanelView = SettingsPanelView.Create(settingsPanelHost, settingsPanelAsset);
@@ -188,19 +189,35 @@ namespace Zarus.UI
 
         private void ShowTutorial()
         {
-            tutorialPanel?.RemoveFromClassList("hidden");
+            if (tutorialPanel == null)
+            {
+                return;
+            }
+
+            HideSettingsPanel();
+            tutorialPanel.RemoveFromClassList(HiddenClassName);
+            UpdateMenuVisibility();
         }
 
         private void HideTutorial()
         {
-            tutorialPanel?.AddToClassList("hidden");
+            if (tutorialPanel == null)
+            {
+                return;
+            }
+
+            tutorialPanel.AddToClassList(HiddenClassName);
+            UpdateMenuVisibility();
         }
 
         private void OnSettingsClicked()
         {
+            HideTutorial();
+
             if (settingsPanelView != null)
             {
                 settingsPanelView.Toggle();
+                UpdateMenuVisibility();
                 return;
             }
 
@@ -210,15 +227,16 @@ namespace Zarus.UI
                 return;
             }
 
-            bool isHidden = settingsPanelHost.ClassListContains("hidden");
+            bool isHidden = settingsPanelHost.ClassListContains(HiddenClassName);
             if (isHidden)
             {
-                settingsPanelHost.RemoveFromClassList("hidden");
+                settingsPanelHost.RemoveFromClassList(HiddenClassName);
             }
             else
             {
-                settingsPanelHost.AddToClassList("hidden");
+                settingsPanelHost.AddToClassList(HiddenClassName);
             }
+            UpdateMenuVisibility();
         }
 
         private void QuitGame()
@@ -233,7 +251,7 @@ namespace Zarus.UI
 
         private void OnSettingsClosed()
         {
-            // Reserved for future behavior (e.g., focus management).
+            UpdateMenuVisibility();
         }
 
         private void ActivateMenuPanelAnimation()
@@ -248,6 +266,58 @@ namespace Zarus.UI
             {
                 menuPanel.AddToClassList("slide-up--active");
             }
+        }
+
+        private bool IsTutorialVisible => tutorialPanel != null && !tutorialPanel.ClassListContains(HiddenClassName);
+
+        private bool IsSettingsVisible
+        {
+            get
+            {
+                if (settingsPanelView != null)
+                {
+                    return settingsPanelView.IsVisible;
+                }
+
+                if (settingsPanelHost != null)
+                {
+                    return !settingsPanelHost.ClassListContains(HiddenClassName);
+                }
+
+                return false;
+            }
+        }
+
+        private void UpdateMenuVisibility()
+        {
+            if (menuPanel == null)
+            {
+                return;
+            }
+
+            bool hideMenu = IsTutorialVisible || IsSettingsVisible;
+            if (hideMenu)
+            {
+                menuPanel.AddToClassList(HiddenClassName);
+            }
+            else
+            {
+                menuPanel.RemoveFromClassList(HiddenClassName);
+            }
+        }
+
+        private void HideSettingsPanel()
+        {
+            if (settingsPanelView != null)
+            {
+                if (settingsPanelView.IsVisible)
+                {
+                    settingsPanelView.Hide();
+                }
+                return;
+            }
+
+            settingsPanelHost?.AddToClassList(HiddenClassName);
         }
     }
 }

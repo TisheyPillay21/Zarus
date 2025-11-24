@@ -9,12 +9,13 @@ namespace Zarus.UI
     /// </summary>
     public class SettingsPanelView
     {
+        private const string DefaultTemplateResourcePath = "UI/Layouts/Screens/SettingsPanel";
         private readonly VisualElement container;
         private readonly VisualElement root;
         private readonly Slider volumeSlider;
         private readonly Toggle fullscreenToggle;
         private readonly Button closeButton;
-
+        private static VisualTreeAsset cachedDefaultTemplate;
         public event Action Closed;
 
         private SettingsPanelView(VisualElement container, VisualElement root)
@@ -42,14 +43,15 @@ namespace Zarus.UI
                 return null;
             }
 
-            if (template == null)
+            var resolvedTemplate = template ?? LoadDefaultTemplate();
+            if (resolvedTemplate == null)
             {
-                Debug.LogWarning("[SettingsPanelView] Settings panel template not assigned.");
+                Debug.LogWarning("[SettingsPanelView] Settings panel template not assigned and no default template found.");
                 return null;
             }
 
             container.Clear();
-            var panelRoot = template.Instantiate();
+            var panelRoot = resolvedTemplate.Instantiate();
             container.Add(panelRoot);
             return new SettingsPanelView(container, panelRoot);
         }
@@ -120,6 +122,20 @@ namespace Zarus.UI
                 Hide();
                 Closed?.Invoke();
             };
+        }
+
+        private static VisualTreeAsset LoadDefaultTemplate()
+        {
+            if (cachedDefaultTemplate == null)
+            {
+                cachedDefaultTemplate = Resources.Load<VisualTreeAsset>(DefaultTemplateResourcePath);
+                if (cachedDefaultTemplate == null)
+                {
+                    Debug.LogWarning($"[SettingsPanelView] Failed to load default template at Resources path '{DefaultTemplateResourcePath}'.");
+                }
+            }
+
+            return cachedDefaultTemplate;
         }
     }
 }

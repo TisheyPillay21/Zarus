@@ -36,4 +36,4 @@ This repo targets Unity **6000.2.10f1**, URP 3D, Input System (see `Assets/Input
 - GIS importer (`Zarus/Map/Rebuild Region Assets`) rebuilds `RegionDatabase.asset` + meshes from `Assets/Sprites/za.json`—run it after GIS changes rather than editing generated assets.
 - Start menu lives in `Assets/Scenes/Start.unity` with layout `UI/Layouts/Screens/StartMenu.uxml` + controller `StartMenuController`. End/game-over menu mirrors this in `Assets/Scenes/End.unity` using `EndMenuController`.
 - Build order is Start → Main → End; use `UIManager.ReturnToMenu()`, `.RestartGame()`, or `.ShowEndScreen()` to hop between scenes at runtime (ESC pause "Quit to Menu" already calls ReturnToMenu).
-- Shared settings overlay uses `UI/Layouts/Screens/SettingsPanel.uxml` + `SettingsPanelView`; instantiate it inside any layout via `SettingsPanelView.Create(hostElement, template)` (see StartMenu & PauseMenu for reference).
+- Shared settings overlay uses `Resources/UI/Layouts/Screens/SettingsPanel.uxml` + `SettingsPanelView`; instantiate it inside any layout via `SettingsPanelView.Create(hostElement, template)` (see StartMenu & PauseMenu for reference).
