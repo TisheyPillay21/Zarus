@@ -25,6 +25,10 @@ namespace Zarus.UI
         [SerializeField]
         private string settingsPanelHostName = "SettingsPanelHost";
 
+        [Header("Settings Panel")]
+        [SerializeField]
+        private VisualTreeAsset settingsPanelAsset;
+
         private UIDocument uiDocument;
         private VisualElement root;
         private VisualElement tutorialPanel;
@@ -34,6 +38,7 @@ namespace Zarus.UI
         private Button tutorialCloseButton;
         private Button settingsButton;
         private Button exitButton;
+        private SettingsPanelView settingsPanelView;
         private bool isInitialized;
 
         private void Awake()
@@ -54,6 +59,14 @@ namespace Zarus.UI
         private void OnDisable()
         {
             UnregisterCallbacks();
+        }
+
+        private void OnDestroy()
+        {
+            if (settingsPanelView != null)
+            {
+                settingsPanelView.Closed -= OnSettingsClosed;
+            }
         }
 
         private void TryInitialize()
@@ -78,8 +91,29 @@ namespace Zarus.UI
             settingsButton = root.Q<Button>("SettingsButton");
             exitButton = root.Q<Button>("ExitButton");
 
+            EnsureSettingsPanel();
             RegisterCallbacks();
             isInitialized = true;
+        }
+
+        private void EnsureSettingsPanel()
+        {
+            if (settingsPanelView != null || settingsPanelHost == null)
+            {
+                return;
+            }
+
+            if (settingsPanelAsset == null)
+            {
+                Debug.LogWarning("[StartMenu] Settings panel asset not assigned.");
+                return;
+            }
+
+            settingsPanelView = SettingsPanelView.Create(settingsPanelHost, settingsPanelAsset);
+            if (settingsPanelView != null)
+            {
+                settingsPanelView.Closed += OnSettingsClosed;
+            }
         }
 
         private void RegisterCallbacks()
@@ -161,7 +195,13 @@ namespace Zarus.UI
 
         private void OnSettingsClicked()
         {
-            Debug.Log("[StartMenu] Settings clicked. Placeholder panel will be replaced once shared settings exist.");
+            if (settingsPanelView != null)
+            {
+                settingsPanelView.Toggle();
+                return;
+            }
+
+            Debug.LogWarning("[StartMenu] Settings panel asset missing.");
             if (settingsPanelHost == null)
             {
                 return;
@@ -186,6 +226,11 @@ namespace Zarus.UI
 #else
             Application.Quit();
 #endif
+        }
+
+        private void OnSettingsClosed()
+        {
+            // Reserved for future behavior (e.g., focus management).
         }
     }
 }

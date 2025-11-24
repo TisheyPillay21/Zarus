@@ -8,10 +8,16 @@ namespace Zarus.UI
     /// </summary>
     public class PauseMenu : UIScreen
     {
+        [Header("Settings Panel")]
+        [SerializeField]
+        private VisualTreeAsset settingsPanelAsset;
+
         private Button resumeButton;
         private Button settingsButton;
         private Button quitButton;
         private VisualElement menuPanel;
+        private VisualElement settingsPanelHost;
+        private SettingsPanelView settingsPanel;
 
         protected override void Initialize()
         {
@@ -20,6 +26,20 @@ namespace Zarus.UI
             settingsButton = Query<Button>("SettingsButton");
             quitButton = Query<Button>("QuitButton");
             menuPanel = Query<VisualElement>("MenuPanel");
+            settingsPanelHost = Query<VisualElement>("SettingsPanelHost");
+
+            if (settingsPanelHost != null && settingsPanelAsset != null)
+            {
+                settingsPanel = SettingsPanelView.Create(settingsPanelHost, settingsPanelAsset);
+                if (settingsPanel != null)
+                {
+                    settingsPanel.Closed += OnSettingsClosed;
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[PauseMenu] Settings panel host or asset missing.");
+            }
 
             // Register button callbacks
             if (resumeButton != null)
@@ -68,14 +88,33 @@ namespace Zarus.UI
 
         private void OnSettingsClicked()
         {
-            Debug.Log("[PauseMenu] Settings clicked (not yet implemented).");
-            // TODO: Implement settings screen
+            if (settingsPanel != null)
+            {
+                settingsPanel.Toggle();
+            }
+            else
+            {
+                Debug.LogWarning("[PauseMenu] Settings panel unavailable.");
+            }
         }
 
         private void OnQuitClicked()
         {
             Debug.Log("[PauseMenu] Quit to menu clicked.");
             UIManager.Instance?.QuitGame();
+        }
+
+        private void OnDestroy()
+        {
+            if (settingsPanel != null)
+            {
+                settingsPanel.Closed -= OnSettingsClosed;
+            }
+        }
+
+        private void OnSettingsClosed()
+        {
+            // Reserved hook for future (e.g., focus return)
         }
     }
 }
