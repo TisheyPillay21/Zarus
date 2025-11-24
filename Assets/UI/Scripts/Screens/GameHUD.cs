@@ -290,7 +290,13 @@ namespace Zarus.UI
 
         private void OnProvinceSelected(RegionEntry region)
         {
-            if (region == null) return;
+            if (region == null)
+            {
+                selectedRegion = null;
+                ResetOutpostActionsUI();
+                RefreshSelectedProvinceState();
+                return;
+            }
 
             selectedRegion = region;
 

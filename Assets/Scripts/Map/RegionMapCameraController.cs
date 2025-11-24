@@ -32,6 +32,9 @@ namespace Zarus.Map
         private Vector2 clampPadding = new Vector2(0.5f, 0.5f);
 
         [SerializeField]
+        private Vector2 wholeMapViewOffset = new Vector2(-0.35f, 0f); // normalized viewport bias (ratio of visible extents) to keep map away from HUD
+
+        [SerializeField]
         private bool drawDebugBounds;
 
         private Camera targetCamera;
@@ -55,6 +58,11 @@ namespace Zarus.Map
             }
         }
 
+        private void Start()
+        {
+            FocusOnWholeMap(true);
+        }
+
         private void LateUpdate()
         {
             HandleZoom();
@@ -70,10 +78,13 @@ namespace Zarus.Map
             }
 
             var worldPos = mapController.GetWorldPosition(entry.Centroid);
-            targetPosition = new Vector3(worldPos.x, worldPos.y, transform.position.z);
-            
-            // Use consistent zoom level for all provinces
             targetOrthoSize = minOrthoSize;
+            targetPosition = ApplyViewportBias(new Vector3(worldPos.x, worldPos.y, transform.position.z), targetOrthoSize);
+
+            if (clampToBounds && mapController != null)
+            {
+                targetPosition = ClampPosition(targetPosition);
+            }
         }
 
         public void FocusOnRegionById(string regionId)
@@ -85,6 +96,48 @@ namespace Zarus.Map
 
             var entry = mapController.GetEntry(regionId);
             FocusOnRegion(entry);
+        }
+
+        public void FocusOnWholeMap(bool instant = false)
+        {
+            if (mapController == null || targetCamera == null)
+            {
+                return;
+            }
+
+            var bounds = mapController.GetWorldBounds();
+            var baseTarget = new Vector3(bounds.center.x, bounds.center.y, transform.position.z);
+            var extents = bounds.extents;
+            var paddedExtents = new Vector2(extents.x + clampPadding.x, extents.y + clampPadding.y);
+            var aspect = Mathf.Max(targetCamera.aspect, 0.01f);
+            var requiredSize = Mathf.Max(paddedExtents.y, paddedExtents.x / aspect);
+            targetOrthoSize = Mathf.Clamp(requiredSize, minOrthoSize, maxOrthoSize);
+            targetPosition = ApplyViewportBias(baseTarget, targetOrthoSize);
+
+            if (clampToBounds && mapController != null)
+            {
+                targetPosition = ClampPosition(targetPosition);
+            }
+
+            if (instant)
+            {
+                transform.position = targetPosition;
+                targetCamera.orthographicSize = targetOrthoSize;
+            }
+        }
+
+        private Vector3 ApplyViewportBias(Vector3 focusPoint, float orthoSize)
+        {
+            if (targetCamera == null)
+            {
+                return focusPoint;
+            }
+
+            var clampedOrtho = Mathf.Max(orthoSize, 0.01f);
+            var horizontalExtent = clampedOrtho * Mathf.Max(targetCamera.aspect, 0.01f);
+            var verticalExtent = clampedOrtho;
+            var offset = new Vector3(horizontalExtent * wholeMapViewOffset.x, verticalExtent * wholeMapViewOffset.y, 0f);
+            return new Vector3(focusPoint.x + offset.x, focusPoint.y + offset.y, focusPoint.z);
         }
 
         private void HandleZoom()

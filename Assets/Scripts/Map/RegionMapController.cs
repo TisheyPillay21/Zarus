@@ -384,6 +384,11 @@ namespace Zarus.Map
             else
             {
                 ClearHover();
+                if (enableSelection && pressedThisFrame)
+                {
+                    ClearSelection();
+                    autoFocusController?.FocusOnWholeMap();
+                }
             }
         }
 
@@ -480,6 +485,17 @@ namespace Zarus.Map
             currentSelection?.UpdateColor(currentSelection.Entry.VisualStyle.SelectedColor, false, colorTransitionDuration);
             onRegionSelected?.Invoke(runtime.Entry);
             autoFocusController?.FocusOnRegion(runtime.Entry);
+        }
+
+        private void ClearSelection()
+        {
+            if (currentSelection != null && highlightSelection)
+            {
+                currentSelection.UpdateColor(currentSelection.Entry.VisualStyle.BaseColor, false, colorTransitionDuration);
+            }
+
+            currentSelection = null;
+            onRegionSelected?.Invoke(null);
         }
 
 #if UNITY_EDITOR
