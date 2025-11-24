@@ -22,6 +22,7 @@ namespace Zarus.UI
 
         private UIDocument uiDocument;
         private VisualElement root;
+        private VisualElement menuPanel;
         private Button restartButton;
         private Button menuButton;
         private Button exitButton;
@@ -60,10 +61,12 @@ namespace Zarus.UI
             }
 
             root = uiDocument.rootVisualElement;
+            menuPanel = root.Q<VisualElement>("MenuPanel");
             restartButton = root.Q<Button>("RestartButton");
             menuButton = root.Q<Button>("MenuButton");
             exitButton = root.Q<Button>("ExitButton");
 
+            ActivateMenuPanelAnimation();
             RegisterCallbacks();
             isInitialized = true;
         }
@@ -133,7 +136,20 @@ namespace Zarus.UI
             EditorApplication.isPlaying = false;
     #else
             Application.Quit();
-    #endif
+#endif
+        }
+
+        private void ActivateMenuPanelAnimation()
+        {
+            if (menuPanel == null)
+            {
+                return;
+            }
+
+            if (!menuPanel.ClassListContains("slide-up--active"))
+            {
+                menuPanel.AddToClassList("slide-up--active");
+            }
         }
     }
 }

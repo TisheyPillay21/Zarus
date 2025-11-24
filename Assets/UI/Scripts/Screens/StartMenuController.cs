@@ -31,6 +31,7 @@ namespace Zarus.UI
 
         private UIDocument uiDocument;
         private VisualElement root;
+        private VisualElement menuPanel;
         private VisualElement tutorialPanel;
         private VisualElement settingsPanelHost;
         private Button startButton;
@@ -82,6 +83,7 @@ namespace Zarus.UI
             }
 
             root = uiDocument.rootVisualElement;
+            menuPanel = root.Q<VisualElement>("MenuPanel");
             tutorialPanel = root.Q<VisualElement>(tutorialPanelName);
             settingsPanelHost = root.Q<VisualElement>(settingsPanelHostName);
 
@@ -92,6 +94,7 @@ namespace Zarus.UI
             exitButton = root.Q<Button>("ExitButton");
 
             EnsureSettingsPanel();
+            ActivateMenuPanelAnimation();
             RegisterCallbacks();
             isInitialized = true;
         }
@@ -231,6 +234,20 @@ namespace Zarus.UI
         private void OnSettingsClosed()
         {
             // Reserved for future behavior (e.g., focus management).
+        }
+
+        private void ActivateMenuPanelAnimation()
+        {
+            if (menuPanel == null)
+            {
+                return;
+            }
+
+            // Menu panel uses slide-up class which is hidden by default without the active modifier.
+            if (!menuPanel.ClassListContains("slide-up--active"))
+            {
+                menuPanel.AddToClassList("slide-up--active");
+            }
         }
     }
 }
