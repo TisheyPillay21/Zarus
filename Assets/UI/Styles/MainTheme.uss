@@ -322,7 +322,6 @@
     translate: 0 16px;
     transition-property: opacity, translate;
     transition-duration: var(--transition-normal);
-    pointer-events: none;
     margin-top: var(--spacing-sm);
     align-self: flex-start;
 }
@@ -330,7 +329,6 @@
 .hud-province-info--visible {
     opacity: 1;
     translate: 0 0;
-    pointer-events: auto;
 }
 
 /* ========================================
@@ -376,7 +374,11 @@
     width: 100%;
     background-color: rgba(8, 16, 28, 0.85);
     border-radius: var(--border-radius-small);
-    border: 1px solid var(--surface-border);
+    border-color: var(--surface-border);
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-md);
     flex-direction: column;

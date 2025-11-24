@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using Zarus.Map;
-using Zarus.UI;
 
 namespace Zarus.Systems
 {
@@ -29,9 +28,6 @@ namespace Zarus.Systems
 
         [SerializeField]
         private DayNightCycleController dayNightController;
-
-        [SerializeField]
-        private UIManager uiManager;
 
         [Header("Rates & Economy")]
         [SerializeField]
@@ -95,6 +91,9 @@ namespace Zarus.Systems
         [SerializeField]
         private UnityEvent onCureCompleted = new UnityEvent();
 
+        [SerializeField]
+        private UnityEvent onOutcomeTriggered = new UnityEvent();
+
         public event Action<ProvinceInfectionState> ProvinceStateChanged;
         public event Action<GlobalCureState> GlobalStateChanged;
         public event Action AllProvincesFullyInfected;
@@ -103,6 +102,7 @@ namespace Zarus.Systems
         public UnityEvent<GlobalCureState> OnGlobalStateChanged => onGlobalStateChanged;
         public UnityEvent OnAllProvincesFullyInfected => onAllProvincesFullyInfected;
         public UnityEvent OnCureCompleted => onCureCompleted;
+        public UnityEvent OnOutcomeTriggered => onOutcomeTriggered;
 
         private readonly Dictionary<string, ProvinceInfectionState> provinces =
             new Dictionary<string, ProvinceInfectionState>(StringComparer.OrdinalIgnoreCase);
@@ -132,11 +132,6 @@ namespace Zarus.Systems
             if (dayNightController == null)
             {
                 dayNightController = FindFirstObjectByType<DayNightCycleController>();
-            }
-
-            if (uiManager == null)
-            {
-                uiManager = FindFirstObjectByType<UIManager>();
             }
 
             globalState = new GlobalCureState
@@ -501,20 +496,7 @@ namespace Zarus.Systems
 
             outcomeTriggered = true;
             GameOutcomeState.SetOutcome(outcome, globalState, dayIndex, savedProvinces, fullyInfectedProvinces);
-
-            if (uiManager == null)
-            {
-                uiManager = FindFirstObjectByType<UIManager>();
-            }
-
-            if (uiManager != null)
-            {
-                uiManager.ShowEndScreen();
-            }
-            else
-            {
-                Debug.LogWarning("[OutbreakSimulation] UIManager not found; cannot display End screen.");
-            }
+            onOutcomeTriggered?.Invoke();
         }
 
         private void LogSummaryIfNeeded(int dayIndex)
